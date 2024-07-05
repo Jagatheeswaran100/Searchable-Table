@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Searchable Table</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container1">
+        <header>
+            <nav>
+                <div class="logo">
+                    <h2>Admin Page</h2>
+                </div>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Admin</a></li>
+                    <li><a href="#">Client</a></li>
+                    <li><a href="#">More</a></li>
+                </ul>
+                <a href="#" class="mobile">&#9776;</a>
+            </nav>
+        </header>
+
+        <aside>
+            <div class="post">
+                <h1>Recent Actions</h1>
+                <ul>
+                    <li><a href="">Lorem ipsum dolor sit amet.</a></li>
+                    <li><a href="">Lorem ipsum dolor sit.</a></li>
+                    <li><a href="">Lorem ipsum dolor sit amet consectetur.</a></li>
+                    <li><a href="">Lorem ipsum dolor sit amet.</a></li>
+                    <li><a href="">Lorem, ipsum dolor.</a></li>
+                </ul>
+            </div>
+
+        </aside>
+
+        <main id="main-content">
+            <div class="container2">
+
+                <div class="search">
+                    <input type="text" id="searchInput" placeholder="  Search...🔎">
+                </div>
+
+                <table id="myTable">
+                    <thead>
+                        <tr>
+                            <th>S.No.</th>
+                            <th>NAME</th>
+                            <th>AGE</th>
+                            <th>DEGREE</th>
+                            <th>DESIGNATION</th>
+                            <th>PLACE</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    </tbody>
+
+                </table>
+
+                <div class="pagination" id="pagination">
+                    <button id="prevPage">&lt;</button>
+                    <span id="pageNumbers"></span>
+                    <button id="nextPage">&gt;</button>
+                </div>
+            </div>
+
+        </main>
+
+        <footer>
+            <h4>All rights reserved @ 2024</h4>
+        </footer>
+
+    </div>
+
+    <script>
+        const data = [
+            [1, "Jagatheeswaran", 23, "M.Sc.,", "Software Developer", "Thiruvarur"],
+            [2, "Balaji", 24, "M.Sc.,", "Web Developer", "Thanjavur"],
+            [3, "Sabari", 29, "B.Tech.,", "R&D Engineer", "Bangalore"],
+            [4, "Gunaal", 23, "MBA", "Human Resource", "Kumbakonam"],
+            [5, "Santhosh", 22, "B.E", "Electronic Engineer", "Thiruvarur"],
+            [6, "Jayakumar", 24, "MCA", "Mainframe Developer", "Dharmapuri"],
+            [7, "Gokul", 24, "MBA", "Human Resource", "Tiruppur"],
+            [8, "Chandru", 23, "B.Sc.,", "Consultant", "Tiruppur"],
+            [9, "Srivatsan", 23, "MBA", "Sales", "Tiruppur"],
+            [10, "Deepak Raj", 24, "MCA", "Test Engineer", "Chennai"],
+            [11, "Krishanth", 22, "B.Sc.,", "Sales", "Karur"],
+            [12, "Jones", 24, "M.Sc.,", "Non Voice Executive", "Chennai"],
+            [13, "Harish", 24, "M.Sc.,", "UI/UX Designer", "Chennai"],
+            [14, "Krishna", 23, "M.com.,", "Sales", "Coimbatore"],
+            [15, "Muthu kumar", 24, "MBA", "Sales", "Chennai"],
+        ];
+
+        const itemsPerPage = 5;
+        let currentPage = 1;
+
+        const populateTable = (page) => {
+            let tbody = document.querySelector("#myTable tbody");
+            tbody.innerHTML = '';
+
+            let startIndex = (page - 1) * itemsPerPage;
+            let endIndex = startIndex + itemsPerPage;
+            let paginatedData = data.slice(startIndex, endIndex);
+
+            for (let i = 0; i < paginatedData.length; i++) {
+                let rowData = paginatedData[i];
+                let row = document.createElement("tr");
+
+                for (let j = 0; j < rowData.length; j++) {
+                    let cellData = rowData[j];
+                    let cell = document.createElement("td");
+                    cell.textContent = cellData;
+                    row.appendChild(cell);
+                }
+
+                tbody.appendChild(row);
+            }
+        }
+
+        const updatePagination = () => {
+            let totalPages = Math.ceil(data.length / itemsPerPage);
+            let pageNumbers = document.getElementById('pageNumbers');
+            pageNumbers.innerHTML = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                let button = document.createElement('button');
+                button.textContent = i;
+                button.addEventListener('click', () => {
+                    currentPage = i;
+                    populateTable(currentPage);
+                    highlightCurrentPage();
+                });
+                pageNumbers.appendChild(button);
+            }
+
+            highlightCurrentPage();
+        }
+
+        const highlightCurrentPage = () => {
+            let buttons = document.querySelectorAll('#pageNumbers button');
+            buttons.forEach(button => {
+                if (parseInt(button.textContent) === currentPage) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                populateTable(currentPage);
+                highlightCurrentPage();
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            let totalPages = Math.ceil(data.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                populateTable(currentPage);
+                highlightCurrentPage();
+            }
+        });
+
+        populateTable(currentPage);
+        updatePagination();
+
+        document.getElementById('searchInput').addEventListener('keyup', () => {
+            let input = document.getElementById('searchInput');
+            let filter = input.value.toLowerCase();
+            let table = document.getElementById('myTable');
+            let tr = table.getElementsByTagName('tr');
+            let found = false;
+
+            for (let i = 1; i < tr.length; i++) {
+                let td = tr[i].getElementsByTagName('td');
+                let match = false;
+                for (let j = 0; j < td.length; j++) {
+                    if (td[j].innerText.toLowerCase().indexOf(filter) > -1) {
+                        match = true;
+                        break;
+                    }
+                }
+                tr[i].style.display = match ? "" : "none";
+                if (match) {
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                alert('No match found in this page');
+            }
+        });
+    </script>
+
+</body>
+
+</html>
